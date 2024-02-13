@@ -1,0 +1,45 @@
+node_modules
+api/node_modules
+api/build
+api/tmp
+
+api/.env
+api/.env.local
+api/.env.production.local
+api/.env.development.local
+
+# Frontend assets compiled code
+api/public/assets
+
+# Build tools specific
+api/npm-debug.log
+api/yarn-error.log
+
+# Editors specific
+api/.fleet
+api/.idea
+api/.vscode
+
+# Platform specific
+api/.DS_Store
+
+ui/node_modules
+ui/build
+ui/tmp
+
+ui/.env
+ui/.env.local
+ui/.env.production.local
+ui/.env.development.local
+
+# Frontend assets compiled code
+ui/public/assets
+
+# Build tools specific
+ui/npm-debug.log
+ui/yarn-error.log
+
+# Editors specific
+ui/.fleet
+ui/.idea
+ui/.vscode

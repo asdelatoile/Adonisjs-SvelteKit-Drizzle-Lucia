@@ -1,0 +1,40 @@
+@uri=http://[::1]:3333
+@ajson=Accept: application/json
+@json=Content-Type: application/json
+@authToken = Authorization: Bearer {{login.response.body.token}}
+
+###
+# @name hello
+GET {{uri}}/ HTTP/1.1
+{{ajson}}
+{{json}}
+
+###
+# @name register
+POST {{uri}}/auth/register HTTP/1.1
+{{ajson}}
+{{json}}
+
+{
+    "email": "test@test.com",
+    "password": "demo1234",
+    "password_confirmation": "demo1234"
+}
+
+###
+# @name login
+POST {{uri}}/auth/login HTTP/1.1
+{{ajson}}
+{{json}}
+
+{
+    "email": "test@test.com",
+    "password": "demo1234"
+}
+
+###
+# @name user
+GET {{uri}}/auth/user HTTP/1.1
+{{ajson}}
+{{json}}
+{{authToken}}
