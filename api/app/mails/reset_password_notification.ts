@@ -7,7 +7,10 @@ export default class ResetPasswordNotification extends BaseMail {
   from = env.get('MAIL_FROM')
   subject = 'Reset Password Notification'
 
-  constructor(private user: typeof users.$inferSelect) {
+  constructor(
+    private user: typeof users.$inferSelect,
+    private resetPassword: string
+  ) {
     super()
   }
 
@@ -19,7 +22,7 @@ export default class ResetPasswordNotification extends BaseMail {
     const signedURL = router
       .builder()
       .prefixUrl(env.get('API_URL'))
-      .params({ id: this.user.id, token: encodeURIComponent(this.user.hashedPassword) })
+      .params({ token: this.resetPassword })
       .makeSigned('resetPassword', {
         expiresIn: '30 minutes',
       })

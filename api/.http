@@ -29,7 +29,28 @@ POST {{uri}}/auth/login HTTP/1.1
 
 {
     "email": "test@test.com",
-    "password": "demo1234"
+    "password": "demo5678"
+}
+
+###
+# @name lostpassword
+POST {{uri}}/auth/password/forgot HTTP/1.1
+{{ajson}}
+{{json}}
+
+{
+    "email": "test@test.com"
+}
+
+###
+# @name resetpassword
+POST {{uri}}/auth/password/reset/yrmiBvYi-CGLMxLLn-QiOk7qS08mOnQRpk4k5vIVT3ZAHayb2i_-HiD6yx581ICM?signature=eyJtZXNzYWdlIjoiL2F1dGgvcGFzc3dvcmQvcmVzZXQveXJtaUJ2WWktQ0dMTXhMTG4tUWlPazdxUzA4bU9uUVJwazRrNXZJVlQzWkFIYXliMmlfLUhpRDZ5eDU4MUlDTSIsImV4cGlyeURhdGUiOiIyMDI0LTAyLTE0VDA4OjE5OjE3LjY3OFoifQ.erNJEG2uodG5g-U8jz72Ecd7iWUijgcwdM1uH4jFFiE HTTP/1.1
+{{ajson}}
+{{json}}
+
+{
+    "password": "demo5678",
+    "password_confirmation": "demo5678"
 }
 
 ###

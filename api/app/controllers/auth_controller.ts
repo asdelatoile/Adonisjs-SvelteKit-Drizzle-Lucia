@@ -5,6 +5,8 @@ import { Argon2id } from 'oslo/password'
 import { takeUniqueOrNull } from '#helpers/database'
 import mail from '@adonisjs/mail/services/main'
 import VerifyEmailNotification from '#mails/verify_email_notification'
+import ResetPasswordNotification from '#mails/reset_password_notification'
+import string from '@adonisjs/core/helpers/string'
 
 import dayjs from 'dayjs'
 import Utc from 'dayjs/plugin/utc.js'
@@ -122,5 +124,74 @@ export default class AuthController {
 
   async user({ auth }: HttpContext) {
     return { user: auth.user }
+  }
+
+  async forgotPassword({ request, response, drizzle, models }: HttpContext) {
+    const data = await vine
+      .compile(
+        vine.object({
+          email: vine.string().trim().email(),
+        })
+      )
+      .validate(request.all(), {
+        messagesProvider: new SimpleMessagesProvider({
+          'required': 'The {{ field }} field is required.',
+          'email.email': 'The email must be a valid email address.',
+        }),
+      })
+
+    const user = await drizzle
+      .select()
+      .from(models.users)
+      .where(eq(models.users.email, data.email))
+      .then(takeUniqueOrNull)
+
+    if (!user) {
+      return response.unprocessableEntity({
+        error: "We can't find a user with that e-mail address.",
+      })
+    }
+
+    const resetPassword = string.random(64)
+    await drizzle.update(models.users).set({ resetPassword }).where(eq(models.users.id, user.id))
+
+    await mail.send(new ResetPasswordNotification(user, resetPassword))
+
+    return { success: 'Please check your email inbox (and spam) for a password reset link.' }
+  }
+
+  async resetPassword({ params, request, response, drizzle, models }: HttpContext) {
+    if (!request.hasValidSignature()) {
+      return response.unprocessableEntity({ error: 'Invalid reset password link.' })
+    }
+
+    const user = await drizzle
+      .select()
+      .from(models.users)
+      .where(eq(models.users.resetPassword, params.token))
+      .then(takeUniqueOrNull)
+
+    if (!user) {
+      return response.unprocessableEntity({ error: 'Invalid reset password link.' })
+    }
+
+    const data = await vine
+      .compile(
+        vine.object({
+          password: vine.string().minLength(8).confirmed(),
+        })
+      )
+      .validate(request.all(), {
+        messagesProvider: new SimpleMessagesProvider({
+          'required': 'The {{ field }} field is required.',
+          'password.minLength': 'The password must be atleast 8 characters.',
+          'password.confirmed': 'The password confirmation does not match.',
+        }),
+      })
+
+    const hashedPassword = await new Argon2id().hash(data.password)
+    await drizzle.update(models.users).set({ hashedPassword }).where(eq(models.users.id, user.id))
+
+    return { success: 'Password reset successfully.' }
   }
 }
