@@ -21,6 +21,8 @@ POST {{uri}}/auth/register HTTP/1.1
     "password_confirmation": "demo1234"
 }
 
+
+
 ###
 # @name login
 POST {{uri}}/auth/login HTTP/1.1
@@ -29,7 +31,7 @@ POST {{uri}}/auth/login HTTP/1.1
 
 {
     "email": "test@test.com",
-    "password": "demo5678"
+    "password": "demo1234"
 }
 
 ###
@@ -56,6 +58,20 @@ POST {{uri}}/auth/password/reset/yrmiBvYi-CGLMxLLn-QiOk7qS08mOnQRpk4k5vIVT3ZAHay
 ###
 # @name user
 GET {{uri}}/auth/user HTTP/1.1
+{{ajson}}
+{{json}}
+{{authToken}}
+
+###
+# @name logout
+POST {{uri}}/auth/logout HTTP/1.1
+{{ajson}}
+{{json}}
+{{authToken}}
+
+###
+# @name resendverify
+POST {{uri}}/auth/email/verify/resend HTTP/1.1
 {{ajson}}
 {{json}}
 {{authToken}}

@@ -3,9 +3,10 @@
     "devapi": "cd api && pnpm run dev",
     "devfront": "cd ui && pnpm run dev",
     "devmail": "maildev --outgoing-pass pass --outgoing-user user --smtp 1027",
+    "crontasks": "node ace scheduler:run",
     "openbrowser": "open http://localhost:5173",
     "openmaildev": "open http://localhost:1080",
-    "dev": "concurrently \"pnpm run devapi\" \"pnpm run devfront\" \"pnpm run devmail\" \"pnpm run openbrowser\" \"pnpm run openmaildev\" "
+    "dev": "concurrently \"pnpm run devapi\" \"pnpm run devfront\" \"pnpm run devmail\" \"pnpm run openbrowser\" \"pnpm run openmaildev\" \"pnpm run crontasks\" "
   },
   "devDependencies": {
     "concurrently": "^8.2.2",

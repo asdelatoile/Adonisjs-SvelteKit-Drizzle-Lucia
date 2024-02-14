@@ -194,4 +194,23 @@ export default class AuthController {
 
     return { success: 'Password reset successfully.' }
   }
+
+  // await lucia.invalidateSession(sessionId);
+  async logout({ lucia, auth, response }: HttpContext) {
+    await lucia.invalidateSession(auth.session?.id)
+
+    return response.noContent()
+  }
+
+  async resendVerificationEmail({ auth, response }: HttpContext) {
+    if (auth.user!.emailVerifiedAt) {
+      return response.unprocessableEntity({ error: 'Your email is already verified.' })
+    }
+
+    await mail.send(new VerifyEmailNotification(auth.user!))
+
+    return {
+      success: 'Please check your email inbox (and spam) for an access link.',
+    }
+  }
 }
