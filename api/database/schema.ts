@@ -1,4 +1,14 @@
-import { pgTable, unique, uuid, text, timestamp, varchar } from 'drizzle-orm/pg-core'
+import { relations } from 'drizzle-orm'
+import {
+  pgTable,
+  unique,
+  uuid,
+  text,
+  timestamp,
+  varchar,
+  index,
+  primaryKey,
+} from 'drizzle-orm/pg-core'
 
 export const users = pgTable(
   'users',
@@ -28,3 +38,99 @@ export const sessions = pgTable('sessions', {
     mode: 'date',
   }).notNull(),
 })
+
+export const roles = pgTable(
+  'roles',
+  {
+    id: uuid('id').defaultRandom().primaryKey().notNull(),
+    name: text('name'),
+  },
+  (table) => {
+    return {
+      rolesNameKey: unique('roles_name_key').on(table.name),
+    }
+  }
+)
+
+export const permissions = pgTable(
+  'permissions',
+  {
+    id: uuid('id').defaultRandom().primaryKey().notNull(),
+    action: varchar('action', { length: 50 }),
+    resource: varchar('resource', { length: 50 }),
+  },
+  (table) => {
+    return {
+      permKey: unique('permissions_action_resource').on(table.action, table.resource),
+    }
+  }
+)
+
+export const usersRoles = pgTable(
+  'users_roles',
+  {
+    userId: uuid('user_id')
+      .notNull()
+      .references(() => users.id),
+    roleId: uuid('role_id')
+      .notNull()
+      .references(() => roles.id),
+  },
+  (table) => {
+    return {
+      userIdx: index('usersRoles_userId').on(table.userId),
+      roleIdx: index('usersRoles_roleId').on(table.roleId),
+      pk: primaryKey({ columns: [table.userId, table.roleId] }),
+    }
+  }
+)
+
+export const rolesPermissions = pgTable(
+  'roles_permissions',
+  {
+    roleId: uuid('role_id')
+      .notNull()
+      .references(() => roles.id),
+    permissionId: uuid('permission_id')
+      .notNull()
+      .references(() => permissions.id),
+  },
+  (table) => {
+    return {
+      roleIdx: index('rolesPermissions_roleId').on(table.roleId),
+      permissionIdx: index('rolesPermissions_permissionId').on(table.permissionId),
+      pk: primaryKey({ columns: [table.roleId, table.permissionId] }),
+    }
+  }
+)
+
+export const usersRelations = relations(users, ({ many }) => ({
+  roles: many(usersRoles),
+}))
+export const rolesRelations = relations(roles, ({ many }) => ({
+  users: many(usersRoles),
+  permissions: many(rolesPermissions),
+}))
+export const usersRolesRelations = relations(usersRoles, ({ one }) => ({
+  role: one(roles, {
+    fields: [usersRoles.roleId],
+    references: [roles.id],
+  }),
+  user: one(users, {
+    fields: [usersRoles.userId],
+    references: [users.id],
+  }),
+}))
+export const permissionsRelations = relations(permissions, ({ many }) => ({
+  roles: many(rolesPermissions),
+}))
+export const rolesPermissionsRelations = relations(rolesPermissions, ({ one }) => ({
+  role: one(roles, {
+    fields: [rolesPermissions.roleId],
+    references: [roles.id],
+  }),
+  permission: one(permissions, {
+    fields: [rolesPermissions.permissionId],
+    references: [permissions.id],
+  }),
+}))

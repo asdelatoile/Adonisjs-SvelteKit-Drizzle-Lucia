@@ -21,8 +21,6 @@ POST {{uri}}/auth/register HTTP/1.1
     "password_confirmation": "demo1234"
 }
 
-
-
 ###
 # @name login
 POST {{uri}}/auth/login HTTP/1.1
@@ -75,3 +73,9 @@ POST {{uri}}/auth/email/verify/resend HTTP/1.1
 {{ajson}}
 {{json}}
 {{authToken}}
+
+###
+# @name test
+GET {{uri}}/test HTTP/1.1
+{{ajson}}
+{{json}}

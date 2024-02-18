@@ -4,9 +4,6 @@ import { db } from '#services/drizzle_service'
 import { PostgresJsDatabase } from 'drizzle-orm/postgres-js'
 import * as schema from '#database/schema'
 
-// (alias) drizzle<typeof schema>(client: postgres.Sql<{}>, config?: DrizzleConfig<typeof schema> | undefined): PostgresJsDatabase<typeof schema>
-// import drizzle
-
 declare module '@adonisjs/core/http' {
   export interface HttpContext {
     drizzle: PostgresJsDatabase<typeof schema>

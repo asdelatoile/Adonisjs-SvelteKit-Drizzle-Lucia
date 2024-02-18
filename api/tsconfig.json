@@ -22,5 +22,6 @@
       "#start/*": ["./start/*.js"],
       "#config/*": ["./config/*.js"]
     }
-  }
+  },
+  "ts-node": { "esm": true }
 }

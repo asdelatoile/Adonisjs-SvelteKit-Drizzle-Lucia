@@ -1,9 +1,130 @@
 {
-  "id": "36736296-fc25-4b01-902f-2f132ed170ae",
+  "id": "d00edc4e-df0e-4eb8-91b6-4c4cd1af8bfb",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "5",
   "dialect": "pg",
   "tables": {
+    "permissions": {
+      "name": "permissions",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "action": {
+          "name": "action",
+          "type": "varchar(50)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "resource": {
+          "name": "resource",
+          "type": "varchar(50)",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "permissions_action_resource": {
+          "name": "permissions_action_resource",
+          "nullsNotDistinct": false,
+          "columns": ["action", "resource"]
+        }
+      }
+    },
+    "roles": {
+      "name": "roles",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "roles_name_key": {
+          "name": "roles_name_key",
+          "nullsNotDistinct": false,
+          "columns": ["name"]
+        }
+      }
+    },
+    "roles_permissions": {
+      "name": "roles_permissions",
+      "schema": "",
+      "columns": {
+        "role_id": {
+          "name": "role_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "permission_id": {
+          "name": "permission_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {
+        "rolesPermissions_roleId": {
+          "name": "rolesPermissions_roleId",
+          "columns": ["role_id"],
+          "isUnique": false
+        },
+        "rolesPermissions_permissionId": {
+          "name": "rolesPermissions_permissionId",
+          "columns": ["permission_id"],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {
+        "roles_permissions_role_id_roles_id_fk": {
+          "name": "roles_permissions_role_id_roles_id_fk",
+          "tableFrom": "roles_permissions",
+          "tableTo": "roles",
+          "columnsFrom": ["role_id"],
+          "columnsTo": ["id"],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "roles_permissions_permission_id_permissions_id_fk": {
+          "name": "roles_permissions_permission_id_permissions_id_fk",
+          "tableFrom": "roles_permissions",
+          "tableTo": "permissions",
+          "columnsFrom": ["permission_id"],
+          "columnsTo": ["id"],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "roles_permissions_role_id_permission_id_pk": {
+          "name": "roles_permissions_role_id_permission_id_pk",
+          "columns": ["role_id", "permission_id"]
+        }
+      },
+      "uniqueConstraints": {}
+    },
     "sessions": {
       "name": "sessions",
       "schema": "",
@@ -102,6 +223,63 @@
           "columns": ["email"]
         }
       }
+    },
+    "users_roles": {
+      "name": "users_roles",
+      "schema": "",
+      "columns": {
+        "user_id": {
+          "name": "user_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "role_id": {
+          "name": "role_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {
+        "usersRoles_userId": {
+          "name": "usersRoles_userId",
+          "columns": ["user_id"],
+          "isUnique": false
+        },
+        "usersRoles_roleId": {
+          "name": "usersRoles_roleId",
+          "columns": ["role_id"],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {
+        "users_roles_user_id_users_id_fk": {
+          "name": "users_roles_user_id_users_id_fk",
+          "tableFrom": "users_roles",
+          "tableTo": "users",
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "users_roles_role_id_roles_id_fk": {
+          "name": "users_roles_role_id_roles_id_fk",
+          "tableFrom": "users_roles",
+          "tableTo": "roles",
+          "columnsFrom": ["role_id"],
+          "columnsTo": ["id"],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "users_roles_user_id_role_id_pk": {
+          "name": "users_roles_user_id_role_id_pk",
+          "columns": ["user_id", "role_id"]
+        }
+      },
+      "uniqueConstraints": {}
     }
   },
   "enums": {},

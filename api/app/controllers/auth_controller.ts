@@ -2,7 +2,6 @@ import type { HttpContext } from '@adonisjs/core/http'
 import vine, { SimpleMessagesProvider } from '@vinejs/vine'
 import { eq } from 'drizzle-orm'
 import { Argon2id } from 'oslo/password'
-import { takeUniqueOrNull } from '#helpers/database'
 import mail from '@adonisjs/mail/services/main'
 import VerifyEmailNotification from '#mails/verify_email_notification'
 import ResetPasswordNotification from '#mails/reset_password_notification'
@@ -10,6 +9,7 @@ import string from '@adonisjs/core/helpers/string'
 
 import dayjs from 'dayjs'
 import Utc from 'dayjs/plugin/utc.js'
+
 dayjs.extend(Utc)
 
 export default class AuthController {
@@ -31,11 +31,9 @@ export default class AuthController {
         }),
       })
 
-    const user = await drizzle
-      .select()
-      .from(models.users)
-      .where(eq(models.users.email, data.email))
-      .then(takeUniqueOrNull)
+    const user = await drizzle.query.users.findFirst({
+      where: (users) => eq(users.email, data.email),
+    })
 
     if (user) {
       return response.unprocessableEntity({ error: 'The email has already been taken.' })
@@ -57,7 +55,7 @@ export default class AuthController {
     }
   }
 
-  async login({ lucia, drizzle, request, response, models }: HttpContext) {
+  async login({ lucia, drizzle, request, response }: HttpContext) {
     const data = await vine
       .compile(
         vine.object({
@@ -72,11 +70,9 @@ export default class AuthController {
         }),
       })
 
-    const user = await drizzle
-      .select()
-      .from(models.users)
-      .where(eq(models.users.email, data.email))
-      .then(takeUniqueOrNull)
+    const user = await drizzle.query.users.findFirst({
+      where: (users) => eq(users.email, data.email),
+    })
 
     if (!user) {
       return response.badRequest({ error: 'Invalid email or password.' })
@@ -101,11 +97,9 @@ export default class AuthController {
     }
 
     const email = decodeURIComponent(params.email)
-    const user = await drizzle
-      .select()
-      .from(models.users)
-      .where(eq(models.users.email, email))
-      .then(takeUniqueOrNull)
+    const user = await drizzle.query.users.findFirst({
+      where: (users) => eq(users.email, email),
+    })
 
     if (!user) {
       return response.unprocessableEntity({ error: 'Invalid verification link.' })
@@ -140,11 +134,9 @@ export default class AuthController {
         }),
       })
 
-    const user = await drizzle
-      .select()
-      .from(models.users)
-      .where(eq(models.users.email, data.email))
-      .then(takeUniqueOrNull)
+    const user = await drizzle.query.users.findFirst({
+      where: (users) => eq(users.email, data.email),
+    })
 
     if (!user) {
       return response.unprocessableEntity({
@@ -165,11 +157,9 @@ export default class AuthController {
       return response.unprocessableEntity({ error: 'Invalid reset password link.' })
     }
 
-    const user = await drizzle
-      .select()
-      .from(models.users)
-      .where(eq(models.users.resetPassword, params.token))
-      .then(takeUniqueOrNull)
+    const user = await drizzle.query.users.findFirst({
+      where: (users) => eq(users.resetPassword, params.token),
+    })
 
     if (!user) {
       return response.unprocessableEntity({ error: 'Invalid reset password link.' })
@@ -195,7 +185,6 @@ export default class AuthController {
     return { success: 'Password reset successfully.' }
   }
 
-  // await lucia.invalidateSession(sessionId);
   async logout({ lucia, auth, response }: HttpContext) {
     await lucia.invalidateSession(auth.session?.id)
 
@@ -210,6 +199,45 @@ export default class AuthController {
     await mail.send(new VerifyEmailNotification(auth.user!))
 
     return {
+      success: 'Please check your email inbox (and spam) for an access link.',
+    }
+  }
+  async test({ drizzle }: HttpContext) {
+    const records = await drizzle.query.users.findMany({
+      with: {
+        roles: {
+          columns: {},
+          with: {
+            role: {
+              columns: { name: true },
+              with: {
+                permissions: {
+                  columns: {},
+                  with: {
+                    permission: {
+                      columns: { resource: true, action: true },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    })
+    const roles = await drizzle.query.roles.findMany({
+      with: {
+        permissions: {
+          columns: {},
+          with: {
+            permission: true,
+          },
+        },
+      },
+    })
+    return {
+      records,
+      roles,
       success: 'Please check your email inbox (and spam) for an access link.',
     }
   }

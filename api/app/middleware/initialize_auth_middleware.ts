@@ -31,8 +31,13 @@ export default class InitializeAuthMiddleware {
     return output
   }
 }
+
+type UserType = typeof users.$inferSelect
+interface ExtendedUser extends UserType {
+  permissions?: any[]
+}
 interface AuthContext {
-  user?: typeof users.$inferSelect
+  user?: ExtendedUser
   session?: typeof sessions.$inferSelect
   isAuthenticated: boolean
 }
