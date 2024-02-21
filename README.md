@@ -14,11 +14,11 @@ Generate schema type
 
     npx kysely-codegen --help --camel-case --out-file ./app/services/types.ts
 
-Adonisjs https://docs.adonisjs.com/
-Kysely (orm) https://kysely.dev/docs/intro
-Lucia https://lucia-auth.com/
-MJML https://documentation.mjml.io/
-Day.js https://day.js.org/
+Adonisjs https://docs.adonisjs.com/\
+Kysely (orm) https://kysely.dev/docs/intro\
+Lucia https://lucia-auth.com/\
+MJML https://documentation.mjml.io/\
+Day.js https://day.js.org/\
 
 ## Front
 
