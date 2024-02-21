@@ -1,14 +1,17 @@
+// import { Users } from '#services/types'
 import env from '#start/env'
 import router from '@adonisjs/core/services/router'
 import { BaseMail } from '@adonisjs/mail'
-import { users } from '#database/schema'
 
 export default class ResetPasswordNotification extends BaseMail {
   from = env.get('MAIL_FROM')
   subject = 'Reset Password Notification'
 
   constructor(
-    private user: typeof users.$inferSelect,
+    private user: {
+      email: string
+      resetPassword: string | null
+    },
     private resetPassword: string
   ) {
     super()

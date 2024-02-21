@@ -1,6 +1,5 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import vine, { SimpleMessagesProvider } from '@vinejs/vine'
-import { eq } from 'drizzle-orm'
 import { Argon2id } from 'oslo/password'
 import mail from '@adonisjs/mail/services/main'
 import VerifyEmailNotification from '#mails/verify_email_notification'
@@ -13,7 +12,7 @@ import Utc from 'dayjs/plugin/utc.js'
 dayjs.extend(Utc)
 
 export default class AuthController {
-  async register({ request, response, drizzle, models }: HttpContext) {
+  async register({ db, request, response }: HttpContext) {
     const data = await vine
       .compile(
         vine.object({
@@ -31,31 +30,39 @@ export default class AuthController {
         }),
       })
 
-    const user = await drizzle.query.users.findFirst({
-      where: (users) => eq(users.email, data.email),
-    })
+    const user = await db
+      .selectFrom('users')
+      .where('email', '=', data.email)
+      .selectAll()
+      .executeTakeFirst()
 
     if (user) {
       return response.unprocessableEntity({ error: 'The email has already been taken.' })
     }
     const hashedPassword = await new Argon2id().hash(data.password)
 
-    const newUser = await drizzle
-      .insert(models.users)
+    const newUser = await db
+      .insertInto('users')
       .values({
         email: data.email,
         hashedPassword,
       })
-      .returning()
+      .returning(['id', 'email'])
+      .executeTakeFirstOrThrow()
 
-    await mail.send(new VerifyEmailNotification(newUser[0]))
+    await mail.send(
+      new VerifyEmailNotification({
+        id: newUser.id,
+        email: newUser.email,
+      })
+    )
 
     return {
       success: 'Please check your email inbox (and spam) for an access link.',
     }
   }
 
-  async login({ lucia, drizzle, request, response }: HttpContext) {
+  async login({ db, lucia, request, response }: HttpContext) {
     const data = await vine
       .compile(
         vine.object({
@@ -70,9 +77,11 @@ export default class AuthController {
         }),
       })
 
-    const user = await drizzle.query.users.findFirst({
-      where: (users) => eq(users.email, data.email),
-    })
+    const user = await db
+      .selectFrom('users')
+      .where('email', '=', data.email)
+      .selectAll()
+      .executeTakeFirst()
 
     if (!user) {
       return response.badRequest({ error: 'Invalid email or password.' })
@@ -91,15 +100,18 @@ export default class AuthController {
     }
   }
 
-  async verifyEmail({ drizzle, models, params, request, response }: HttpContext) {
+  async verifyEmail({ db, params, request, response }: HttpContext) {
     if (!request.hasValidSignature()) {
       return response.unprocessableEntity({ error: 'Invalid verification link.' })
     }
 
     const email = decodeURIComponent(params.email)
-    const user = await drizzle.query.users.findFirst({
-      where: (users) => eq(users.email, email),
-    })
+
+    const user = await db
+      .selectFrom('users')
+      .where('email', '=', email)
+      .selectAll()
+      .executeTakeFirst()
 
     if (!user) {
       return response.unprocessableEntity({ error: 'Invalid verification link.' })
@@ -107,10 +119,13 @@ export default class AuthController {
 
     if (!user.emailVerifiedAt) {
       user.emailVerifiedAt = dayjs().utc().toDate()
-      await drizzle
-        .update(models.users)
-        .set({ emailVerifiedAt: dayjs().utc().toDate() })
-        .where(eq(models.users.id, user.id))
+      await db
+        .updateTable('users')
+        .set({
+          emailVerifiedAt: dayjs().utc().toDate(),
+        })
+        .where('id', '=', user.id)
+        .executeTakeFirst()
     }
 
     return { success: 'Email verified successfully.' }
@@ -120,7 +135,7 @@ export default class AuthController {
     return { user: auth.user }
   }
 
-  async forgotPassword({ request, response, drizzle, models }: HttpContext) {
+  async forgotPassword({ db, request, response }: HttpContext) {
     const data = await vine
       .compile(
         vine.object({
@@ -134,9 +149,11 @@ export default class AuthController {
         }),
       })
 
-    const user = await drizzle.query.users.findFirst({
-      where: (users) => eq(users.email, data.email),
-    })
+    const user = await db
+      .selectFrom('users')
+      .where('email', '=', data.email)
+      .selectAll()
+      .executeTakeFirst()
 
     if (!user) {
       return response.unprocessableEntity({
@@ -145,21 +162,30 @@ export default class AuthController {
     }
 
     const resetPassword = string.random(64)
-    await drizzle.update(models.users).set({ resetPassword }).where(eq(models.users.id, user.id))
+
+    await db
+      .updateTable('users')
+      .set({
+        resetPassword,
+      })
+      .where('id', '=', user.id)
+      .executeTakeFirst()
 
     await mail.send(new ResetPasswordNotification(user, resetPassword))
 
     return { success: 'Please check your email inbox (and spam) for a password reset link.' }
   }
 
-  async resetPassword({ params, request, response, drizzle, models }: HttpContext) {
+  async resetPassword({ db, params, request, response }: HttpContext) {
     if (!request.hasValidSignature()) {
       return response.unprocessableEntity({ error: 'Invalid reset password link.' })
     }
 
-    const user = await drizzle.query.users.findFirst({
-      where: (users) => eq(users.resetPassword, params.token),
-    })
+    const user = await db
+      .selectFrom('users')
+      .where('resetPassword', '=', params.token)
+      .selectAll()
+      .executeTakeFirst()
 
     if (!user) {
       return response.unprocessableEntity({ error: 'Invalid reset password link.' })
@@ -180,7 +206,14 @@ export default class AuthController {
       })
 
     const hashedPassword = await new Argon2id().hash(data.password)
-    await drizzle.update(models.users).set({ hashedPassword }).where(eq(models.users.id, user.id))
+
+    await db
+      .updateTable('users')
+      .set({
+        hashedPassword,
+      })
+      .where('id', '=', user.id)
+      .executeTakeFirst()
 
     return { success: 'Password reset successfully.' }
   }
@@ -196,48 +229,14 @@ export default class AuthController {
       return response.unprocessableEntity({ error: 'Your email is already verified.' })
     }
 
-    await mail.send(new VerifyEmailNotification(auth.user!))
+    await mail.send(
+      new VerifyEmailNotification({
+        id: auth.user.id.toString(),
+        email: auth.user.email,
+      })
+    )
 
     return {
-      success: 'Please check your email inbox (and spam) for an access link.',
-    }
-  }
-  async test({ drizzle }: HttpContext) {
-    const records = await drizzle.query.users.findMany({
-      with: {
-        roles: {
-          columns: {},
-          with: {
-            role: {
-              columns: { name: true },
-              with: {
-                permissions: {
-                  columns: {},
-                  with: {
-                    permission: {
-                      columns: { resource: true, action: true },
-                    },
-                  },
-                },
-              },
-            },
-          },
-        },
-      },
-    })
-    const roles = await drizzle.query.roles.findMany({
-      with: {
-        permissions: {
-          columns: {},
-          with: {
-            permission: true,
-          },
-        },
-      },
-    })
-    return {
-      records,
-      roles,
       success: 'Please check your email inbox (and spam) for an access link.',
     }
   }

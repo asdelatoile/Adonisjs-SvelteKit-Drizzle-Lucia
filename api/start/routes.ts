@@ -9,9 +9,9 @@
 
 import router from '@adonisjs/core/services/router'
 import { middleware } from '#start/kernel'
+import { db } from '#services/db'
+import { getRolesPermissionsFromUsers, getSessionsFromUsers } from '#helpers/kysely'
 const AuthController = () => import('#controllers/auth_controller')
-
-router.get('/test', [AuthController, 'test'])
 
 router.post('/auth/login', [AuthController, 'login'])
 router.post('/auth/register', [AuthController, 'register'])
@@ -21,7 +21,9 @@ router.post('/auth/password/reset/:token', [AuthController, 'resetPassword']).as
 
 router
   .group(() => {
-    router.get('/auth/user', [AuthController, 'user']).use(middleware.perm())
+    router
+      .get('/auth/user', [AuthController, 'user'])
+      .use(middleware.checkperm({ r: 'users', a: 'list' }))
     router.post('/auth/logout', [AuthController, 'logout'])
     router.post('/auth/email/verify/resend', [AuthController, 'resendVerificationEmail'])
     router
@@ -36,3 +38,22 @@ router
     return { message: 'It works!' }
   })
   .use(middleware.auth())
+
+router.get('/test2', async () => {
+  const records = await db
+    .selectFrom('users')
+    .select((qb) => [
+      'id',
+      'email',
+      'createdAt',
+      'updatedAt',
+      getSessionsFromUsers(qb),
+      getRolesPermissionsFromUsers(qb),
+    ])
+    .execute()
+
+  return {
+    message: 'It works!',
+    records,
+  }
+})

@@ -44,7 +44,7 @@ POST {{uri}}/auth/password/forgot HTTP/1.1
 
 ###
 # @name resetpassword
-POST {{uri}}/auth/password/reset/yrmiBvYi-CGLMxLLn-QiOk7qS08mOnQRpk4k5vIVT3ZAHayb2i_-HiD6yx581ICM?signature=eyJtZXNzYWdlIjoiL2F1dGgvcGFzc3dvcmQvcmVzZXQveXJtaUJ2WWktQ0dMTXhMTG4tUWlPazdxUzA4bU9uUVJwazRrNXZJVlQzWkFIYXliMmlfLUhpRDZ5eDU4MUlDTSIsImV4cGlyeURhdGUiOiIyMDI0LTAyLTE0VDA4OjE5OjE3LjY3OFoifQ.erNJEG2uodG5g-U8jz72Ecd7iWUijgcwdM1uH4jFFiE HTTP/1.1
+POST {{uri}}/auth/password/reset/JXvP37tA8XvidypCm2J9MN8J1zKOGDawdede-IIT5VlTwrAOAd0aY-c20BDtz10R?signature=eyJtZXNzYWdlIjoiL2F1dGgvcGFzc3dvcmQvcmVzZXQvSlh2UDM3dEE4WHZpZHlwQ20ySjlNTjhKMXpLT0dEYXdkZWRlLUlJVDVWbFR3ckFPQWQwYVktYzIwQkR0ejEwUiIsImV4cGlyeURhdGUiOiIyMDI0LTAyLTIwVDIwOjEwOjU0LjAyMFoifQ.GSGvEqT831Di1AcI9DSoDNjVXwTRqp5NM4ozI9Mk_Q0 HTTP/1.1
 {{ajson}}
 {{json}}
 
@@ -77,5 +77,11 @@ POST {{uri}}/auth/email/verify/resend HTTP/1.1
 ###
 # @name test
 GET {{uri}}/test HTTP/1.1
+{{ajson}}
+{{json}}
+
+###
+# @name test2
+GET {{uri}}/test2 HTTP/1.1
 {{ajson}}
 {{json}}

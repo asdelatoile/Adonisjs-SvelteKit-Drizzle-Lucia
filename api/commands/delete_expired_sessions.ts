@@ -1,10 +1,7 @@
-import { drizzle } from 'drizzle-orm/postgres-js'
 import { BaseCommand } from '@adonisjs/core/ace'
 import type { CommandOptions } from '@adonisjs/core/types/ace'
-import { DrizzlePostgreSQLAdapter } from '@lucia-auth/adapter-drizzle'
-import drizzleConfig from '#config/drizzle'
-import * as schema from '#database/schema'
-import postgres from 'postgres'
+import { KyselyAdapter } from '#services/kysely_adapter'
+import { db, pool } from '#services/db'
 
 export default class DeleteExpiredSessions extends BaseCommand {
   static commandName = 'lucia:delete-expired-sessions'
@@ -14,11 +11,9 @@ export default class DeleteExpiredSessions extends BaseCommand {
 
   async run() {
     this.logger.info('Delete expired sessions...')
-    const queryClient = postgres(drizzleConfig.databaseUrl, { max: drizzleConfig.pool })
-    const db = drizzle(queryClient, { schema })
-    const adapter = new DrizzlePostgreSQLAdapter(db, schema.sessions, schema.users)
+    const adapter = new KyselyAdapter(db)
     await adapter.deleteExpiredSessions()
-    queryClient.end()
+    pool.end()
     this.logger.info('Ok')
   }
 }

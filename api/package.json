@@ -11,9 +11,7 @@
     "test": "node ace test",
     "lint": "eslint .",
     "format": "prettier --write .",
-    "typecheck": "tsc --noEmit",
-    "db:generate": "drizzle-kit generate:pg",
-    "db:push": "drizzle-kit push:pg"
+    "typecheck": "tsc --noEmit"
   },
   "imports": {
     "#controllers/*": "./app/controllers/*.js",
@@ -44,8 +42,9 @@
     "@japa/runner": "^3.1.1",
     "@swc/core": "^1.4.1",
     "@types/node": "^20.11.19",
-    "drizzle-kit": "^0.20.14",
+    "@types/pg": "^8.11.0",
     "eslint": "^8.56.0",
+    "kysely-codegen": "^0.11.0",
     "pg": "^8.11.3",
     "pino-pretty": "^10.3.1",
     "prettier": "^3.2.5",
@@ -55,12 +54,11 @@
   "dependencies": {
     "@adonisjs/core": "^6.2.3",
     "@adonisjs/mail": "^9.2.0",
-    "@lucia-auth/adapter-drizzle": "^1.0.2",
     "@vinejs/vine": "^1.7.1",
     "adonisjs-scheduler": "^1.0.0",
     "dayjs": "^1.11.10",
-    "drizzle-orm": "^0.29.3",
     "edge.js": "^6.0.1",
+    "kysely": "^0.27.2",
     "lucia": "^3.0.1",
     "mjml": "^4.15.3",
     "oslo": "^1.1.1",

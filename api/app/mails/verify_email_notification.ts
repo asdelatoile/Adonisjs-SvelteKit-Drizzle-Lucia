@@ -1,13 +1,18 @@
 import env from '#start/env'
 import router from '@adonisjs/core/services/router'
 import { BaseMail } from '@adonisjs/mail'
-import { users } from '#database/schema'
+// import { users } from '#database/schema'
 
 export default class VerifyEmailNotification extends BaseMail {
   from = env.get('MAIL_FROM')
   subject = 'Verify Email Address'
 
-  constructor(private user: typeof users.$inferInsert) {
+  constructor(
+    private user: {
+      id: string
+      email: string
+    }
+  ) {
     super()
   }
 

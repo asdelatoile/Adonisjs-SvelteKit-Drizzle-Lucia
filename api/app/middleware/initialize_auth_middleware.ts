@@ -1,6 +1,7 @@
+import { Users, Sessions } from '#services/types'
 import type { HttpContext } from '@adonisjs/core/http'
 import type { NextFn } from '@adonisjs/core/types/http'
-import { sessions, users } from '#database/schema'
+// import { Session } from 'lucia'
 
 export default class InitializeAuthMiddleware {
   async handle(ctx: HttpContext, next: NextFn) {
@@ -32,13 +33,13 @@ export default class InitializeAuthMiddleware {
   }
 }
 
-type UserType = typeof users.$inferSelect
-interface ExtendedUser extends UserType {
-  permissions?: any[]
-}
+// type UserType = typeof users.$inferSelect
+// interface ExtendedUser extends UserType {
+//   permissions?: any[]
+// }
 interface AuthContext {
-  user?: ExtendedUser
-  session?: typeof sessions.$inferSelect
+  user: Users
+  session?: Sessions
   isAuthenticated: boolean
 }
 declare module '@adonisjs/core/http' {

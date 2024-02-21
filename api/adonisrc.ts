@@ -32,7 +32,7 @@ export default defineConfig({
       file: () => import('@adonisjs/core/providers/repl_provider'),
       environment: ['repl', 'test'],
     },
-    () => import('#providers/drizzle_provider'),
+    () => import('#providers/db_provider'),
     () => import('#providers/lucia_provider'),
     () => import('@adonisjs/core/providers/vinejs_provider'),
     () => import('@adonisjs/mail/mail_provider'),

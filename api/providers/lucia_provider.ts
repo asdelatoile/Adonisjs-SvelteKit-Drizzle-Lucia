@@ -1,10 +1,9 @@
 import type { ApplicationService } from '@adonisjs/core/types'
 import { HttpContext } from '@adonisjs/core/http'
-import { DrizzlePostgreSQLAdapter } from '@lucia-auth/adapter-drizzle'
 import { Lucia } from 'lucia'
-import { users, sessions } from '#database/schema'
-import { db } from '#services/drizzle_service'
 import globalApp from '@adonisjs/core/services/app'
+import { db } from '#services/db'
+import { KyselyAdapter } from '#services/kysely_adapter'
 
 declare module '@adonisjs/core/http' {
   export interface HttpContext {
@@ -14,7 +13,7 @@ declare module '@adonisjs/core/http' {
 declare module 'lucia' {
   interface Register {
     Lucia: typeof Lucia
-    DatabaseUserAttributes: Omit<typeof users, 'id'>
+    DatabaseUserAttributes: any
   }
 }
 
@@ -33,8 +32,7 @@ export default class LuciaProvider {
     HttpContext.getter(
       'lucia',
       function (this: HttpContext) {
-        const adapter = new DrizzlePostgreSQLAdapter(db, sessions, users)
-
+        const adapter = new KyselyAdapter(db)
         return new Lucia(adapter, {
           sessionCookie: {
             attributes: {
@@ -47,6 +45,8 @@ export default class LuciaProvider {
               email: attributes.email,
               createdAt: attributes.createdAt,
               updatedAt: attributes.updatedAt,
+              // hashedPassword: attributes.hashedPassword,
+              emailVerifiedAt: attributes.emailVerifiedAt,
             }
           },
         })
