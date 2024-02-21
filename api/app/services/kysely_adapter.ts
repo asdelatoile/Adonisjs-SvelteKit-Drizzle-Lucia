@@ -1,4 +1,4 @@
-import { DB } from '#services/types'
+import { DB } from '#database/types'
 import { Kysely } from 'kysely'
 import type {
   Adapter,

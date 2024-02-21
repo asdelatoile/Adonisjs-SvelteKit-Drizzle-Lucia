@@ -1,4 +1,4 @@
-import { DB } from './types.js'
+import { DB } from '#database/types'
 import pg from 'pg'
 import { CamelCasePlugin, Kysely, PostgresDialect } from 'kysely'
 import dbConfig from '#config/db'

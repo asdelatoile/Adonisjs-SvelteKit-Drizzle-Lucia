@@ -12,7 +12,7 @@ Use REST visual studio code (file api/.http) : https://marketplace.visualstudio.
 
 Generate schema type
 
-    npx kysely-codegen --help --camel-case --out-file ./app/services/types.ts
+    npx kysely-codegen --camel-case --out-file ./database/types.ts 
 
 Adonisjs https://docs.adonisjs.com/  
 Kysely (orm) https://kysely.dev/docs/intro  

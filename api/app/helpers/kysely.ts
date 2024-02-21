@@ -1,4 +1,4 @@
-import { DB } from '#services/types'
+import { DB } from '#database/types'
 import { ExpressionBuilder } from 'kysely'
 import { jsonArrayFrom } from 'kysely/helpers/postgres'
 

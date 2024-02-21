@@ -8,14 +8,14 @@ export type Generated<T> =
 export type Timestamp = ColumnType<Date, Date | string, Date | string>
 
 export interface Permissions {
-  action: string | null
+  action: string
   id: Generated<string>
   resource: string | null
 }
 
 export interface Roles {
   id: Generated<string>
-  name: string | null
+  name: string
 }
 
 export interface RolesPermissions {
@@ -30,13 +30,13 @@ export interface Sessions {
 }
 
 export interface Users {
-  createdAt: Generated<Timestamp | null>
+  createdAt: Generated<Timestamp>
   email: string
   emailVerifiedAt: Timestamp | null
   hashedPassword: string
   id: Generated<string>
   resetPassword: string | null
-  updatedAt: Generated<Timestamp | null>
+  updatedAt: Generated<Timestamp>
 }
 
 export interface UsersRoles {

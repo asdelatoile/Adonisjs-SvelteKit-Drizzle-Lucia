@@ -1,5 +1,5 @@
 import { db } from '#services/db'
-import { DB } from '#services/types'
+import { DB } from '#database/types'
 import { HttpContext } from '@adonisjs/core/http'
 import type { ApplicationService } from '@adonisjs/core/types'
 import { Kysely } from 'kysely'
