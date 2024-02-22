@@ -21,9 +21,7 @@ router.post('/auth/password/reset/:token', [AuthController, 'resetPassword']).as
 
 router
   .group(() => {
-    router
-      .get('/auth/user', [AuthController, 'user'])
-      .use(middleware.checkperm({ r: 'users', a: 'list' }))
+    router.get('/auth/user', [AuthController, 'user'])
     router.post('/auth/logout', [AuthController, 'logout'])
     router.post('/auth/email/verify/resend', [AuthController, 'resendVerificationEmail'])
     router
@@ -39,21 +37,43 @@ router
   })
   .use(middleware.auth())
 
-router.get('/test2', async () => {
-  const records = await db
-    .selectFrom('users')
-    .select((qb) => [
-      'id',
-      'email',
-      'createdAt',
-      'updatedAt',
-      getSessionsFromUsers(qb),
-      getRolesPermissionsFromUsers(qb),
-    ])
-    .execute()
+router
+  .get('/test', async () => {
+    return {
+      message: 'Ok',
+    }
+  })
+  .use([
+    middleware.auth(),
+    middleware.checkperm({
+      resource: 'auth',
+      action: 'me',
+    }),
+  ])
 
-  return {
-    message: 'It works!',
-    records,
-  }
-})
+router
+  .get('/test2', async () => {
+    const records = await db
+      .selectFrom('users')
+      .select((qb) => [
+        'id',
+        'email',
+        'createdAt',
+        'updatedAt',
+        getSessionsFromUsers(qb),
+        getRolesPermissionsFromUsers(qb),
+      ])
+      .execute()
+
+    return {
+      message: 'It works!',
+      records,
+    }
+  })
+  .use([
+    middleware.auth(),
+    middleware.checkperm({
+      resource: 'users',
+      action: 'list',
+    }),
+  ])

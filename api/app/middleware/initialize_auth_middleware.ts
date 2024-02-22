@@ -1,6 +1,7 @@
 import { Users, Sessions } from '#database/types'
 import type { HttpContext } from '@adonisjs/core/http'
 import type { NextFn } from '@adonisjs/core/types/http'
+import { Selectable } from 'kysely'
 
 export default class InitializeAuthMiddleware {
   async handle(ctx: HttpContext, next: NextFn) {
@@ -33,8 +34,8 @@ export default class InitializeAuthMiddleware {
 }
 
 interface AuthContext {
-  user: Users
-  session?: Sessions
+  user: Selectable<Users>
+  session?: Selectable<Sessions>
   isAuthenticated: boolean
 }
 declare module '@adonisjs/core/http' {

@@ -80,6 +80,7 @@ POST {{uri}}/auth/email/verify/resend HTTP/1.1
 GET {{uri}}/test HTTP/1.1
 {{ajson}}
 {{json}}
+{{authToken}}
 
 ###
 # @name test2

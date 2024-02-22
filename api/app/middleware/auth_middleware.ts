@@ -7,7 +7,7 @@ export default class AuthMiddleware {
      * Middleware logic goes here (before the next call)
      */
     if (!auth.isAuthenticated) {
-      return response.unauthorized({ error: 'Forbidden' })
+      return response.forbidden({ error: 'Forbidden' })
     }
 
     /**

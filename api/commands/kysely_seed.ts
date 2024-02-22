@@ -44,24 +44,16 @@ export default class KyselySeed extends BaseCommand {
         .insertInto('permissions')
         .values([
           {
-            action: 'auth',
-            resource: '*',
+            resource: 'auth',
+            action: '*',
           },
           {
-            action: 'users',
-            resource: 'list',
+            resource: 'users',
+            action: '*',
           },
           {
-            action: 'users',
-            resource: 'add',
-          },
-          {
-            action: 'users',
-            resource: 'delete',
-          },
-          {
-            action: 'users',
-            resource: 'update',
+            resource: 'users',
+            action: 'list',
           },
         ])
         .returningAll()
@@ -86,10 +78,6 @@ export default class KyselySeed extends BaseCommand {
         .insertInto('rolesPermissions')
         .values([
           {
-            roleId: insertRoles[1].id,
-            permissionId: insertPermissions[0].id,
-          },
-          {
             roleId: insertRoles[0].id,
             permissionId: insertPermissions[0].id,
           },
@@ -98,16 +86,12 @@ export default class KyselySeed extends BaseCommand {
             permissionId: insertPermissions[1].id,
           },
           {
-            roleId: insertRoles[0].id,
+            roleId: insertRoles[1].id,
+            permissionId: insertPermissions[0].id,
+          },
+          {
+            roleId: insertRoles[1].id,
             permissionId: insertPermissions[2].id,
-          },
-          {
-            roleId: insertRoles[0].id,
-            permissionId: insertPermissions[3].id,
-          },
-          {
-            roleId: insertRoles[0].id,
-            permissionId: insertPermissions[4].id,
           },
         ])
         .execute()
