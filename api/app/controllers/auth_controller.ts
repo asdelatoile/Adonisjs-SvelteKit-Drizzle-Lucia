@@ -5,11 +5,7 @@ import mail from '@adonisjs/mail/services/main'
 import VerifyEmailNotification from '#mails/verify_email_notification'
 import ResetPasswordNotification from '#mails/reset_password_notification'
 import string from '@adonisjs/core/helpers/string'
-
-import dayjs from 'dayjs'
-import Utc from 'dayjs/plugin/utc.js'
-
-dayjs.extend(Utc)
+import { dayjsUtc } from '#helpers/dayjs'
 
 export default class AuthController {
   async register({ db, request, response }: HttpContext) {
@@ -118,11 +114,11 @@ export default class AuthController {
     }
 
     if (!user.emailVerifiedAt) {
-      user.emailVerifiedAt = dayjs().utc().toDate()
+      user.emailVerifiedAt = dayjsUtc().toDate()
       await db
         .updateTable('users')
         .set({
-          emailVerifiedAt: dayjs().utc().toDate(),
+          emailVerifiedAt: dayjsUtc().toDate(),
         })
         .where('id', '=', user.id)
         .executeTakeFirst()

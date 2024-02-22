@@ -3,9 +3,7 @@ import { Kysely } from 'kysely'
 export async function up(db: Kysely<any>): Promise<void> {
   await db.schema
     .createTable('users_roles')
-    .addColumn('user_id', 'uuid', (col) =>
-      col.references('users.id').onDelete('no action').notNull()
-    )
+    .addColumn('user_id', 'uuid', (col) => col.references('users.id').onDelete('cascade').notNull())
     .addColumn('role_id', 'uuid', (col) =>
       col.references('roles.id').onDelete('no action').notNull()
     )
