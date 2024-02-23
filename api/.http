@@ -1,4 +1,4 @@
-@uri=http://[::1]:3333
+@uri=http://[::1]:3333/api
 @ajson=Accept: application/json
 @json=Content-Type: application/json
 @authToken = Authorization: Bearer {{login.response.body.token}}
