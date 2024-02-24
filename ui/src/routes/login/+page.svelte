@@ -1,41 +1,91 @@
 <script lang="ts">
-	import type { ActionData, PageData } from './$types';
-	import { enhance } from '$app/forms';
+	import { Mail, Lock } from 'lucide-svelte';
+	import { page } from '$app/stores';
+	import { superForm } from 'sveltekit-superforms';
+	import SuperDebug from 'sveltekit-superforms';
+	import * as flashModule from 'sveltekit-flash-message/client';
 
-	export let data: PageData;
-	export let form: ActionData;
+	export let data;
+	const { form, errors, message, constraints, enhance } = superForm(data.form, {
+		resetForm: false,
+		flashMessage: {
+			module: flashModule
+		},
+		syncFlashMessage: true
+	});
 </script>
 
 <svelte:head>
 	<title>Login</title>
 </svelte:head>
 
-<h1>Login</h1>
+<SuperDebug data={$form} />
 
-<section>
+{#if $message}
+	<!-- eslint-disable-next-line svelte/valid-compile -->
+	<div class="status" class:error={$page.status >= 400} class:success={$page.status == 200}>
+		{$message.message}
+	</div>
+{/if}
+
+<div class="container mx-auto pt-8">
 	<form method="post" use:enhance>
-		<div class="group">
-			<label for="email">Email</label>
-			<input type="email" name="email" id="email" value={form?.email ?? ''} required />
-		</div>
+		<label
+			class="input input-bordered flex items-center gap-2"
+			class:input-error={$errors.email && $errors.email.length > 0}
+		>
+			<Mail size={20} strokeWidth={1} class="opacity-70" />
+			<input
+				type="email"
+				class="grow"
+				placeholder="Email"
+				name="email"
+				id="email"
+				on:input={() => {
+					$errors.email = [];
+				}}
+				aria-invalid={$errors.email && $errors.email.length > 0 ? 'true' : undefined}
+				bind:value={$form.email}
+				{...$constraints.email}
+			/>
+			{#if $errors.email && $errors.email.length > 0}
+				<div class="label">
+					<span class="label-text-alt">{$errors.email.join(',')}</span>
+				</div>
+			{/if}
+		</label>
 
-		<div class="group">
-			<label for="password">Password</label>
-			<input type="password" name="password" id="password" value={form?.password ?? ''} required />
-		</div>
-
-		<div class="submit-container">
-			<button type="submit">Login</button>
-		</div>
-
-		{#if form?.error}
-			<div class="notice error">
-				{form.error}
+		<label
+			class="input input-bordered flex items-center gap-2 mt-5"
+			class:input-error={$errors.password && $errors.password.length > 0}
+		>
+			<Lock size={20} strokeWidth={1} class="opacity-70" />
+			<input
+				type="password"
+				class="grow"
+				placeholder="Password"
+				name="password"
+				id="password"
+				on:input={() => {
+					$errors.password = [];
+				}}
+				aria-invalid={$errors.email && $errors.email.length > 0 ? 'true' : undefined}
+				bind:value={$form.password}
+				on:input={() => {
+					$errors.password = [];
+				}}
+				{...$constraints.password}
+				required
+			/>
+		</label>
+		{#if $errors.password && $errors.password.length > 0}
+			<div class="label">
+				<span class="label-text-alt">{$errors.password.join(',')}</span>
 			</div>
 		{/if}
-	</form>
 
-	<div class="actions">
-		<a href="/signup">Sign Up</a>
-	</div>
-</section>
+		<div class="text-center mt-8">
+			<button type="submit" class="btn btn-primary">Login</button>
+		</div>
+	</form>
+</div>

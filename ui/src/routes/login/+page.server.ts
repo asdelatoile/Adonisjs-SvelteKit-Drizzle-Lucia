@@ -1,53 +1,76 @@
 import type { PageServerLoad, Actions } from './$types';
-import { redirect, fail } from '@sveltejs/kit';
-// import { loginUser } from '$lib/user.model';
+import { redirect } from '@sveltejs/kit';
+import { superValidate, message } from 'sveltekit-superforms';
+import { vine } from 'sveltekit-superforms/adapters';
+import { schema } from './schema.js';
 
-export const load: PageServerLoad = (event) => {
+const defaults = { email: '', password: '' };
+
+export const load: PageServerLoad = async (event) => {
 	const user = event.locals.user;
 	if (user) {
 		redirect(302, '/guarded');
 	}
+	const form = await superValidate(vine(schema, { defaults }));
+
+	return { form };
 };
 
 export const actions: Actions = {
-	default: async (event) => {
-		const formData = Object.fromEntries(await event.request.formData());
+	default: async ({ cookies, fetch, request }) => {
+		const form = await superValidate(request, vine(schema, { defaults }));
 
-		if (!formData.email || !formData.password) {
-			return fail(400, {
-				error: 'Missing email or password',
-				email: formData.email,
-				password: formData.password
+		// Check validation
+		if (!form.valid) {
+			// reset password field
+			form.data.password = '';
+			return message(form, {
+				type: 'error',
+				message: 'Invalid form'
 			});
 		}
 
-		const { email, password } = formData as { email: string; password: string };
+		try {
+			const { email, password } = form.data;
+			const res = await fetch('/api/auth/login', {
+				method: 'POST',
+				body: JSON.stringify({
+					email,
+					password
+				}),
+				headers: {
+					'Content-Type': 'application/json'
+				}
+			});
+			const resJson = await res.json();
+			const { token, error } = resJson;
 
-		const res = await event.fetch('/api/auth/login', {
-			method: 'POST',
-			body: JSON.stringify({
-				email,
-				password
-			}),
-			headers: {
-				'Content-Type': 'application/json'
+			if (error) {
+				return message(form, {
+					type: 'error',
+					message: error
+				});
 			}
-		});
-		const resJson = await res.json();
-		console.log('resJson', resJson);
-		const { token } = resJson;
 
-		if (token) {
 			// Set the cookie
-			event.cookies.set('AuthorizationToken', `Bearer ${token}`, {
+			cookies.set('AuthorizationToken', `Bearer ${token}`, {
 				httpOnly: true,
 				path: '/',
 				secure: true,
 				sameSite: 'strict',
 				maxAge: 60 * 60 * 24 // 1 day
 			});
+			console.log('redirect');
+			redirect(302, '/');
+		} catch (err) {
+			if (err && err instanceof Error) {
+				return message(form, {
+					type: 'error',
+					message: 'Internal Server Error'
+				});
+			} else {
+				throw err;
+			}
 		}
-
-		return fail(400, { error: 'Invalid credentials!', email, password });
 	}
 };
