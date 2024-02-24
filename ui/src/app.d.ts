@@ -7,7 +7,7 @@ declare global {
 			user: unknown;
 		}
 		interface PageData {
-			flash?: { type: 'success' | 'error'; message: string };
+			flash?: { type: 'success' | 'error' | 'info' | 'warning'; message: string };
 		}
 		// interface PageState {}
 		// interface Platform {}

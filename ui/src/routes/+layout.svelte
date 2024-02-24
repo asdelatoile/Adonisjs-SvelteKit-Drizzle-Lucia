@@ -2,16 +2,21 @@
 	import '../app.css';
 	import { getFlash } from 'sveltekit-flash-message';
 	import { page } from '$app/stores';
-	import toast, { Toaster } from 'svelte-french-toast';
+	import Toaster from '$lib/components/Toaster.svelte';
 
+	import { createToast } from '$lib/runes/toast.svelte';
+	const toasts = createToast();
 	const flash = getFlash(page);
 
 	$: if ($flash) {
-		console.log('debug', JSON.stringify($flash));
-		$flash.type == 'success' ? toast.success($flash.message) : toast.error($flash.message);
+		toasts.addToast({
+			type: $flash.type,
+			message: $flash.message
+		});
 		$flash = undefined;
 	}
 </script>
 
 <Toaster />
+
 <slot />

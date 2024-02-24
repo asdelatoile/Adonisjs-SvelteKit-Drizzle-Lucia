@@ -16,6 +16,7 @@
 		"@sveltejs/kit": "^2.5.1",
 		"@sveltejs/vite-plugin-svelte": "^3.0.2",
 		"@types/eslint": "8.56.3",
+		"@types/uuid": "^9.0.8",
 		"@typescript-eslint/eslint-plugin": "^7.0.2",
 		"@typescript-eslint/parser": "^7.0.2",
 		"@vinejs/vine": "^1.7.1",
@@ -38,6 +39,6 @@
 	"type": "module",
 	"dependencies": {
 		"lucide-svelte": "^0.338.0",
-		"svelte-french-toast": "^1.2.0"
+		"uuid": "^9.0.1"
 	}
 }
