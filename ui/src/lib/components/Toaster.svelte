@@ -4,22 +4,22 @@
 </script>
 
 {#if toasts.records.length}
-	<div class="toast toast-center toast-bottom">
+	<div class="toast toast-center toast-bottom z-50">
 		{#each toasts.records as toast}
 			{#if toast.type === 'error'}
-				<div class={`alert alert-error`}>
+				<div class="alert alert-error text-white">
 					<span>{toast.message}</span>
 				</div>
 			{:else if toast.type === 'info'}
-				<div class={`alert alert-info`}>
+				<div class="alert alert-info">
 					<span>{toast.message}</span>
 				</div>
 			{:else if toast.type === 'success'}
-				<div class={`alert alert-success`}>
+				<div class="alert alert-success">
 					<span>{toast.message}</span>
 				</div>
 			{:else}
-				<div class={`alert alert-warning`}>
+				<div class="alert alert-warning">
 					<span>{toast.message}</span>
 				</div>
 			{/if}

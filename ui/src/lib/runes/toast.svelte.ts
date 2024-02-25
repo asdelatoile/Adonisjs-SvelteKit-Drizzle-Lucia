@@ -19,16 +19,10 @@ export const createToast = (context = 'default'): Toasts => {
 	}
 	let toasts = $state<Toast[]>([]);
 	const closeToast = (id: string) => {
-		console.log(id);
 		toasts = toasts.filter((elt) => elt.id !== id);
 	};
 	const addToast = ({ message, duration = 2500, type = 'info' }: Toast) => {
 		const newId = uuidv4();
-		console.log('new', {
-			type,
-			message,
-			id: newId
-		});
 		toasts = [
 			...toasts,
 			{

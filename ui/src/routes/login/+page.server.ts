@@ -4,12 +4,12 @@ import { superValidate, message } from 'sveltekit-superforms';
 import { vine } from 'sveltekit-superforms/adapters';
 import { schema } from './schema.js';
 
-const defaults = { email: '', password: '' };
+const defaults = { email: 'test@test.com', password: 'demo1234' };
 
 export const load: PageServerLoad = async (event) => {
 	const user = event.locals.user;
 	if (user) {
-		redirect(302, '/guarded');
+		redirect(302, '/admin/dashboard');
 	}
 	const form = await superValidate(vine(schema, { defaults }));
 
@@ -26,7 +26,7 @@ export const actions: Actions = {
 			form.data.password = '';
 			return message(form, {
 				type: 'error',
-				message: 'Invalid form'
+				message: 'Invalid email or password.'
 			});
 		}
 
@@ -37,10 +37,7 @@ export const actions: Actions = {
 				body: JSON.stringify({
 					email,
 					password
-				}),
-				headers: {
-					'Content-Type': 'application/json'
-				}
+				})
 			});
 			const resJson = await res.json();
 			const { token, error } = resJson;
@@ -53,15 +50,15 @@ export const actions: Actions = {
 			}
 
 			// Set the cookie
-			cookies.set('AuthorizationToken', `Bearer ${token}`, {
+			cookies.set('AuthorizationToken', token, {
 				httpOnly: true,
 				path: '/',
 				secure: true,
 				sameSite: 'strict',
 				maxAge: 60 * 60 * 24 // 1 day
 			});
-			console.log('redirect');
-			redirect(302, '/');
+
+			redirect(302, '/admin/dashboard');
 		} catch (err) {
 			if (err && err instanceof Error) {
 				return message(form, {
