@@ -2,6 +2,14 @@
 @tailwind components;
 @tailwind utilities;
 
+html {
+	@apply min-h-full h-full;
+}
+
+body {
+	@apply min-h-full;
+}
+
 input:-webkit-autofill,
 input:-webkit-autofill:focus {
 	transition:

@@ -1,6 +1,9 @@
 <script lang="ts">
 	import type { PageData } from './$types';
-	export let data: PageData;
+
+	let { data } = $props<{
+		data: PageData;
+	}>();
 </script>
 
 {#if data && data.user}

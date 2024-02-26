@@ -12,7 +12,17 @@ export default {
 		'text-white',
 		'alert-info',
 		'alert-warning',
-		'alert-success'
+		'alert-success',
+		'navbar',
+		'dropdown',
+		'dropdown-end',
+		'btn',
+		'btn-ghost',
+		'btn-circle',
+		'avatar',
+		'menu',
+		'menu-sm',
+		'dropdown-content'
 	],
 	theme: {
 		extend: {}
