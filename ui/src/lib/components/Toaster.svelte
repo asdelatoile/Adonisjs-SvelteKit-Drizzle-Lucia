@@ -11,15 +11,15 @@
 					<span>{toast.message}</span>
 				</div>
 			{:else if toast.type === 'info'}
-				<div class="alert alert-info">
+				<div class="alert alert-info text-white">
 					<span>{toast.message}</span>
 				</div>
 			{:else if toast.type === 'success'}
-				<div class="alert alert-success">
+				<div class="alert alert-success text-white">
 					<span>{toast.message}</span>
 				</div>
 			{:else}
-				<div class="alert alert-warning">
+				<div class="alert alert-warning text-white">
 					<span>{toast.message}</span>
 				</div>
 			{/if}

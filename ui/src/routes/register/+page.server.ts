@@ -2,7 +2,7 @@ import { redirect, type Actions } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 import { message, superValidate } from 'sveltekit-superforms';
 import { vine } from 'sveltekit-superforms/adapters';
-import { schema, type typeReturnData } from './schema';
+import { schema } from './schema';
 
 const defaults = { email: '', password: '', password_confirmation: '' };
 
@@ -15,8 +15,6 @@ export const load: PageServerLoad = async (event) => {
 
 	return { form };
 };
-
-
 
 export const actions: Actions = {
 	default: async ({ fetch, request }) => {
@@ -31,8 +29,8 @@ export const actions: Actions = {
 		}
 
 		try {
-			const { email, password, password_confirmation } = form.data as typeReturnData;
-			const res = await fetch('/api/auth/login', {
+			const { email, password, password_confirmation } = form.data;
+			const res = await fetch('/api/auth/register', {
 				method: 'POST',
 				body: JSON.stringify({
 					email,
@@ -49,6 +47,8 @@ export const actions: Actions = {
 					message: error
 				});
 			}
+
+			form.data = defaults;
 
 			return message(form, {
 				type: 'success',

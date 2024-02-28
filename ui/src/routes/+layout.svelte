@@ -4,14 +4,12 @@
 	import { page } from '$app/stores';
 	import Toaster from '$lib/components/Toaster.svelte';
 	import { createToast } from '$lib/runes/toast.svelte';
-	// import type { LayoutData } from './$types';
 	import type { Snippet } from 'svelte';
 
 	const toasts = createToast();
 	const flash = getFlash(page);
 
 	let { children } = $props<{
-		// data: LayoutData;
 		children: Snippet;
 	}>();
 
