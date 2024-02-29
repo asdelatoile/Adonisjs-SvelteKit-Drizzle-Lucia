@@ -28,9 +28,11 @@ POST {{uri}}/auth/login HTTP/1.1
 {{json}}
 
 {
+    "email": "crypto@asdelatoile.com",
+    "password": "12345678"
     // "email": "test@test.com",
-    "email": "admin@test.com",
-    "password": "demo1234"
+    // "email": "admin@test.com",
+    // "password": "demo1234"
 }
 
 ###
